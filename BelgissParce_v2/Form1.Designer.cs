@@ -42,6 +42,7 @@
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.webControl2 = new Awesomium.Windows.Forms.WebControl(this.components);
+            this.button2 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // btnFind
@@ -166,11 +167,22 @@
             this.webControl2.Size = new System.Drawing.Size(993, 452);
             this.webControl2.TabIndex = 23;
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(314, 483);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(75, 23);
+            this.button2.TabIndex = 24;
+            this.button2.Text = "button2";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1281, 517);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.webControl2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.button1);
@@ -208,6 +220,7 @@
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private Awesomium.Windows.Forms.WebControl webControl2;
+        private System.Windows.Forms.Button button2;
     }
 }
 

@@ -7,6 +7,8 @@ using Awesomium.Core;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.IO;
 using System.Diagnostics;
+using System.Net.Mail;
+using System.Net;
 
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,7 +17,6 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net;
 using System.Management;
 using System.Data.OleDb;
 
@@ -51,6 +52,7 @@ namespace ActualGost
 
         }
 
+        bool workFlag = true; //флаг для определения ошибки при проверки по базам. Если все ровно, то не меняется, иначе - false
         private void btnFind_Click(object sender, EventArgs e)
         {
             checkBox1.Enabled = false;
@@ -92,7 +94,7 @@ namespace ActualGost
                     //ObjWorkExcel.Visible = true;
                 }
                 catch (Exception err)
-                { MessageBox.Show("FATAL ERROR: " + err); }
+                { MessageBox.Show("FATAL ERROR: " + err); workFlag = false; }
               }
             /*try
             {
@@ -139,7 +141,7 @@ namespace ActualGost
                     
                 }
                 catch (Exception err)
-                { MessageBox.Show("FATAL ERROR: " + err); }
+                { MessageBox.Show("FATAL ERROR: " + err); workFlag = false; }
 
             else if (checkBox1.Checked)
                 try
@@ -167,7 +169,7 @@ namespace ActualGost
                     
                 }
                 catch (Exception err)
-                { MessageBox.Show("FATAL ERROR: " + err); }
+                { MessageBox.Show("FATAL ERROR: " + err); workFlag = false; }
             checkBox1.Enabled = true;
             checkBox2.Enabled = true;
             btnFind.Enabled = true;
@@ -175,13 +177,76 @@ namespace ActualGost
             Process[] ps1 = System.Diagnostics.Process.GetProcessesByName("EXCEL");
             foreach (Process p1 in ps1)
                 p1.Kill();
+
+            //MessageBox.Show(fileName + " || " + saveFileName);
+
+
+            if (workFlag == true)
+            {
+                try
+                {
+                    //CreateTestMessage1("exchange.nncsm.ru", 587);
+                }
+                catch
+                { MessageBox.Show("ERROR"); }
+                MessageBox.Show("Сообщение усепшно отправлено адресату");
+            }
             this.Close();
         }
 
+        public void CreateTestMessage1(string server, int port)
+        {
+            string from = "nikolaevn@nncsm.ru";
+            string to = "chubanova@nncsm.ru";
+            string subject = "Проверенная ОА";
+            string body = "Проверенный файл ОА : " + saveFileName;
+            string file = fileName;
 
-        
-        
-        
+            MailMessage message = new MailMessage(from, to, subject, body);
+
+            Attachment data = new Attachment(file);
+            message.Attachments.Add(data);
+
+            SmtpClient client = new SmtpClient(server, port);
+            
+            // Credentials are necessary if the server requires the client 
+            // to authenticate before it will send e-mail on the client's behalf.
+            client.Credentials = CredentialCache.DefaultNetworkCredentials;
+            //client.Credentials = new System.Net.NetworkCredential("login@mail.ru", "password"); // Указываем логин и пароль для авторизации
+
+            try
+            {
+                client.Send(message);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage1(): {0}",
+                            ex.ToString());
+            }
+
+
+            ///
+            ///отправить это же сообщение лично мне для проверки
+            ///
+
+            MailMessage message2 = new MailMessage(from, from, subject, body);
+
+            message2.Attachments.Add(data);
+            client.Credentials = CredentialCache.DefaultNetworkCredentials;
+
+            try
+            {
+                client.Send(message2);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Exception caught in CreateTestMessage1(): {0}",
+                            ex.ToString());
+            }
+        }
+
+
+
         //БелГИСС
         public void BellGiss()
         {
@@ -637,7 +702,6 @@ namespace ActualGost
                                 }
                             }
                         }
-                        
                     }
 
                     else
@@ -1060,13 +1124,25 @@ namespace ActualGost
         ///////////////////////////////////////////////////////////////////////////////////////
 
         ///////////////////////////////////////////////////////////////////////////////////////
-        ////   ///////   //////////////////////////////////////////////////////////////////////
-        ////   ///////   /////        ///        //   /////////////////////////////////////////
-        ////   //   //   /////   //   ///   //   //   /////////////////////////////////////////
-        ////   //   //   /////   //   ///   //   //   /////////////////////////////////////////
-        ////   //   //   /////   //   ///        //   /////////////////////////////////////////
-        ////   //   //   /////   //   ///   //   //   /////////////////////////////////////////
-        ////             ///     //   ///   //   //   /////////////////////////////////////////
+        /////////////////        //////////////////////////////////////////////////////////////
+        /////////////////   //   /////        /////        ///       ///       ////////////////
+        /////////////////   //   /////   //   /////   //   ///   ///////   ////////////////////
+        /////////////////   //   /////   //   /////   //   ///   ///////   ////////////////////
+        /////////////////   //   /////        /////   //   ///       ///       ////////////////
+        ///////////////            ///   //   /////   //   ///   ///////   ////////////////////
+        ///////////////   //////   ///   //   ///     //   ///       ///       ////////////////
+        ///////////////////////////////////////////////////////////////////////////////////////
+
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////
+        ///////////////////   ///////   ///////////////////////////////////////////////////////
+        ///////////////////   ///////   /////        ///        ///   ///   ///////////////////
+        ///////////////////   //   //   /////   //   ///   //   ///   //   ////////////////////
+        ///////////////////   //   //   /////   //   ///   //   ///   /   /////////////////////
+        ///////////////////   //   //   /////   //   ///        ///      //////////////////////
+        ///////////////////   //   //   /////   //   ///   //   ///   //   ////////////////////
+        ///////////////////             ///     //   ///   //   ///   ///   ///////////////////
         ///////////////////////////////////////////////////////////////////////////////////////
 
 
@@ -1089,7 +1165,6 @@ namespace ActualGost
                 Application.DoEvents();
             }
             //Thread.Sleep(1000);
-
 
 
             //--------------------------------------------------------------------------------------------//
@@ -1259,6 +1334,15 @@ namespace ActualGost
 
             //--------------------------------- вывод информации по ГОСТу ---------------------------------//
             //---------------------------------------------------------------------------------------------//
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            ///попробовать намутить создание бюллетени по гостам
+            ///примерно как-то так...
+            ///1-спарсить с сайта заказ и список гостов из него
+            ///2-вписать в адр строку поисковый запрос с номером госта
+            ///3-спарсить полученный результат, а именно краткое описание госта
         }
 
         // Представительство более не используется
